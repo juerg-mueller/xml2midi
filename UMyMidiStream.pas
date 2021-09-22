@@ -54,6 +54,8 @@ type
     function IsEqualEvent(const Event: TMidiEvent): boolean;
     procedure SetEvent(c, d1_, d2_: integer);
     procedure AppendByte(b: byte);
+    procedure AppendAnsiString(s: AnsiString);
+    procedure AppendString(s: String);
   end;
   PMidiEvent = ^TMidiEvent;
 
@@ -125,6 +127,7 @@ implementation
 
 uses
   UEventArray;
+
 function BytesToAnsiString(const Bytes: array of byte): AnsiString;
 var
   i: integer;
@@ -389,6 +392,19 @@ begin
   bytes[Length(bytes)-1] := b;
 end;
 
+procedure TMidiEvent.AppendAnsiString(s: AnsiString);
+var
+  i: integer;
+begin
+  SetLength(bytes, Length(s));
+  for i := 0 to Length(s)-1 do
+    bytes[i] := Byte(s[i+1]);
+end;
+
+procedure TMidiEvent.AppendString(s: String);
+begin
+  AppendAnsiString(AnsiString(s));
+end;
 
 function MidiOnlyNote(Pitch: byte; Sharp: boolean): string;
 begin

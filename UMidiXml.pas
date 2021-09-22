@@ -27,7 +27,7 @@ implementation
 {$R *.dfm}
 
 uses
-  ShellApi, UMyMidiStream, UMidiDataStream;
+  ShellApi, UMyMidiStream, UEventArray;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
@@ -68,6 +68,10 @@ begin
 end;
 
 procedure TForm1.ConvertFile(const Filename: string);
+var
+  MidiEvent: TMidiEvent;
+  Partitur: TEventArray;
+  iTrack, iEvent: integer;
 
   procedure WriteAttributes(Node: IXMLNode);
   var
@@ -86,9 +90,14 @@ procedure TForm1.ConvertFile(const Filename: string);
       writeln('    NodeValue: ', Node.NodeValue);
   end;
 
+  procedure AppendEvent;
+  begin
+    inc(iEvent);
+    SetLength(Partitur.TrackArr[iTrack], iEvent+1);
+    Partitur.TrackArr[iTrack][iEvent] := MidiEvent;
+  end;
+
 var
-  Stream: TMidiSaveStream;
-  MidiEvent: TMidiEvent;
   mem: TMemoryStream;
   s: AnsiString;
   t: string;
@@ -100,6 +109,7 @@ var
   FirstTrack: boolean;
   SaveName: string;
   TimestampType: string;
+  iAbsolute, iOffset: integer;
 begin
   Savename := Filename;
   SetLength(Savename, Length(Savename) - Length(ExtractFileExt(Savename)));
@@ -110,7 +120,7 @@ begin
     exit;
   end;
 
-  Stream := TMidiSaveStream.Create;
+  Partitur := TEventArray.Create;
   mem := TMemoryStream.Create;
   try
     mem.LoadFromFile(Filename);
@@ -133,6 +143,7 @@ begin
     FirstTrack := true;
     TicksPerBeat := 120;
     TimestampType := 'Delta';
+    iTrack := -1;
     for i := 0 to Root.ChildNodes.Count-1 do
     begin
       Track := Root.ChildNodes[i];
@@ -143,19 +154,19 @@ begin
       else
       if t = 'TicksPerBeat' then
       begin
-        TicksPerBeat := StrToIntDef(Track.NodeValue, 120);
+        Partitur.DetailHeader.DeltaTimeTicks := StrToIntDef(Track.NodeValue, 120);
       end else
       if t = 'TimestampType' then
-        TimestampType := Track.NodeValue
+        TimestampType := Track.NodeValue // Absolute or Delta
       else
       if t = 'Track' then
       begin
-        if FirstTrack then
-        begin
-          Stream.SetHead(TicksPerBeat);
-          FirstTrack := false;
-        end;
-        Stream.AppendTrackHead(0);
+        inc(iTrack);
+        SetLength(Partitur.TrackArr, iTrack+1);
+        MidiEvent.Clear;
+        iEvent := -1;
+        iOffset := 0;
+        AppendEvent;
         for k := 0 to Track.ChildNodes.Count-1 do
         begin
           Event := Track.ChildNodes[k];
@@ -168,9 +179,60 @@ begin
             begin
               Node1 := Event.ChildNodes[n];
               t := Node1.NodeName;
-              if t = 'Delta' then // TimestampType?
+              if t = 'Delta' then
                 MidiEvent.var_len := StrToIntDef(Node1.NodeValue, 0)
               else
+              if t = 'Absolute' then
+              begin
+                iAbsolute := StrToIntDef(Node1.NodeValue, 0);
+                if iAbsolute > iOffset then
+                begin
+                  inc(Partitur.TrackArr[iTrack][iEvent].var_len, iAbsolute - iOffset);
+                  iOffset := iAbsolute;
+                end;
+              end else
+              if t = 'TextEvent' then
+              begin
+                MidiEvent.d1 := 1;
+                MidiEvent.AppendString(Node1.NodeValue);
+                AppendEvent;
+              end else
+              if t = 'CopyrightNotice' then
+              begin
+                MidiEvent.d1 := 2;
+                MidiEvent.AppendString(Node1.NodeValue);
+                AppendEvent;
+              end else
+              if t = 'TrackName' then
+              begin
+                MidiEvent.d1 := 3;
+                MidiEvent.AppendString(Node1.NodeValue);
+                AppendEvent;
+              end else
+              if t = 'InstrumentName' then
+              begin
+                MidiEvent.d1 := 4;
+                MidiEvent.AppendString(Node1.NodeValue);
+                AppendEvent;
+              end else
+              if t = 'Lyric' then
+              begin
+                MidiEvent.d1 := 5;
+                MidiEvent.AppendString(Node1.NodeValue);
+                AppendEvent;
+              end else
+              if t = 'Marker' then
+              begin
+                MidiEvent.d1 := 6;
+                MidiEvent.AppendString(Node1.NodeValue);
+                AppendEvent;
+              end else
+              if t = 'CuePoint' then
+              begin
+                MidiEvent.d1 := 7;
+                MidiEvent.AppendString(Node1.NodeValue);
+                AppendEvent;
+              end else
               if t = 'SetTempo' then
               begin
                 MidiEvent.d1 := $51;
@@ -178,7 +240,7 @@ begin
                 MidiEvent.AppendByte(tempo shr 16);
                 MidiEvent.AppendByte((tempo shr 8) and $ff);
                 MidiEvent.AppendByte(tempo and $ff);
-                Stream.AppendEvent(MidiEvent);
+                AppendEvent;
               end else
               if t = 'TimeSignature' then
               begin
@@ -187,37 +249,37 @@ begin
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['LogDenominator'], 2));
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['MIDIClocksPerMetronomeClick'], 24));
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['ThirtySecondsPer24Clocks'], 8));
-                Stream.AppendEvent(MidiEvent);
+                AppendEvent;
               end else
               if t = 'KeySignature' then
               begin
                 MidiEvent.d1 := $58;
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['Fifths'], 4));
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['Mode'], 2));
-                Stream.AppendEvent(MidiEvent);
+                AppendEvent;
               end else
               if t = 'EndOfTrack' then
               begin
-                Stream.AppendTrackEnd(false);
+//                Stream.AppendTrackEnd(false);
               end else
               if t = 'MIDIChannelPrefix' then
               begin
-               MidiEvent.d1 := $20;
-               MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['Value'], 4));
-               Stream.AppendEvent(MidiEvent);
+                MidiEvent.d1 := $20;
+                MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['Value'], 4));
+                AppendEvent;
               end else
               if t = 'ProgramChange' then
               begin
                 MidiEvent.command := StrToIntDef(Node1.Attributes['Channel'], 0) or $C0;
                 MidiEvent.d1 := StrToIntDef(Node1.Attributes['Number'], 0);
-                Stream.AppendEvent(MidiEvent);
+                AppendEvent;
               end else
               if t = 'ControlChange' then
               begin
                 MidiEvent.command := StrToIntDef(Node1.Attributes['Channel'], 0) or $B0;
                 MidiEvent.d1 := StrToIntDef(Node1.Attributes['Control'], 0);
                 MidiEvent.d1 := StrToIntDef(Node1.Attributes['Value'], 0);
-                Stream.AppendEvent(MidiEvent);
+                AppendEvent;
               end else
               if (t = 'NoteOn') or (t = 'NoteOff') then
               begin
@@ -232,7 +294,7 @@ begin
                   inc(MidiEvent.command, $80);
                   MidiEvent.d2 := $40;
                 end;
-                Stream.AppendEvent(MidiEvent);
+                AppendEvent;
               end else begin
                 writeln('event error: "', t, '" is not implemented yet!');
                 WriteAttributes(Node1);
@@ -245,11 +307,10 @@ begin
         WriteAttributes(Track);
       end;
     end;
-    stream.Size := stream.Position;
-    stream.SaveToFile(Savename);
+    Partitur.SaveMidiToFile(Savename, false);
   finally
     mem.Free;
-    Stream.Free;
+    Partitur.Free;
   end;
 end;
 

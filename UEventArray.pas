@@ -40,7 +40,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function LoadMidiFromFile(FileName: string): boolean;
-    function SaveMidiToFile(FileName: string): boolean;
+    function SaveMidiToFile(FileName: string; UseHeaderTrack: boolean = true): boolean;
     function SaveSimpleMidiToFile(FileName: string): boolean;
     procedure Clear;
     procedure Move_var_len; overload;
@@ -222,7 +222,7 @@ begin
   end;
 end;
 
-function TEventArray.SaveMidiToFile(FileName: string): boolean;
+function TEventArray.SaveMidiToFile(FileName: string; UseHeaderTrack: boolean): boolean;
 var
   i: integer;
   SaveStream: TMidiSaveStream;
@@ -230,9 +230,12 @@ begin
   SaveStream := TMidiSaveStream.Create;
   try
     SaveStream.SetHead(DetailHeader.DeltaTimeTicks);
-    SaveStream.AppendTrackHead;
-    SaveStream.AppendHeaderMetaEvents(DetailHeader);
-    SaveStream.AppendTrackEnd(false);
+    if UseHeaderTrack then
+    begin
+      SaveStream.AppendTrackHead;
+      SaveStream.AppendHeaderMetaEvents(DetailHeader);
+      SaveStream.AppendTrackEnd(false);
+    end;
     for i := 0 to Length(TrackArr)-1 do
     begin
       SaveStream.AppendTrackHead;

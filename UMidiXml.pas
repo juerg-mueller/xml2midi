@@ -104,7 +104,7 @@ var
     result := '';
     ole := Node.NodeValue;
     if VarIsNull(ole) then
-      writeln('NodeValue is null ', Node.NodeName)
+//      writeln('NodeValue is null ', Node.NodeName)
     else
       result := Node.NodeValue;
   end;

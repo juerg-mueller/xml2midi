@@ -180,7 +180,7 @@ begin
               Node1 := Event.ChildNodes[n];
               t := Node1.NodeName;
               if t = 'Delta' then
-                MidiEvent.var_len := StrToIntDef(Node1.NodeValue, 0)
+                inc(Partitur.TrackArr[iTrack][iEvent].var_len, StrToIntDef(Node1.NodeValue, 0))
               else
               if t = 'Absolute' then
               begin

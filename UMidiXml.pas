@@ -109,6 +109,17 @@ var
       result := Node.NodeValue;
   end;
 
+  procedure AppendMetaEvent(Nr: integer; Node: IXMLNode);
+  var
+    s: string;
+  begin
+    MidiEvent.d1 := Nr;
+    s := GetNodeValue(Node);
+    MidiEvent.AppendString(s);
+    if s <> '' then
+      AppendEvent;
+  end;
+
 var
   mem: TMemoryStream;
   s: AnsiString;
@@ -205,45 +216,31 @@ begin
               end else
               if t = 'TextEvent' then
               begin
-                MidiEvent.d1 := 1;
-                MidiEvent.AppendString(GetNodeValue(Node1));
-                AppendEvent;
+                AppendMetaEvent(1, Node1);
               end else
               if t = 'CopyrightNotice' then
               begin
-                MidiEvent.d1 := 2;
-                MidiEvent.AppendString(GetNodeValue(Node1));
-                AppendEvent;
+                AppendMetaEvent(2, Node1);
               end else
               if t = 'TrackName' then
               begin
-                MidiEvent.d1 := 3;
-                MidiEvent.AppendString(GetNodeValue(Node1));
-                AppendEvent;
+                AppendMetaEvent(3, Node1);
               end else
               if t = 'InstrumentName' then
               begin
-                MidiEvent.d1 := 4;
-                MidiEvent.AppendString(GetNodeValue(Node1));
-                AppendEvent;
+                AppendMetaEvent(4, Node1);
               end else
               if t = 'Lyric' then
               begin
-                MidiEvent.d1 := 5;
-                MidiEvent.AppendString(GetNodeValue(Node1));
-                AppendEvent;
+                AppendMetaEvent(5, Node1);
               end else
               if t = 'Marker' then
               begin
-                MidiEvent.d1 := 6;
-                MidiEvent.AppendString(GetNodeValue(Node1));
-                AppendEvent;
+                AppendMetaEvent(6, Node1);
               end else
               if t = 'CuePoint' then
               begin
-                MidiEvent.d1 := 7;
-                MidiEvent.AppendString(GetNodeValue(Node1));
-                AppendEvent;
+                AppendMetaEvent(7, Node1);
               end else
               if t = 'SetTempo' then
               begin

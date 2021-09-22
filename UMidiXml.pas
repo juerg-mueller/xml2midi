@@ -97,6 +97,18 @@ var
     Partitur.TrackArr[iTrack][iEvent] := MidiEvent;
   end;
 
+  function GetNodeValue(Node: IXMLNode): string;
+  var
+    ole: oleVariant;
+  begin
+    result := '';
+    ole := Node.NodeValue;
+    if VarIsNull(ole) then
+      writeln('NodeValue is null ', Node.NodeName)
+    else
+      result := Node.NodeValue;
+  end;
+
 var
   mem: TMemoryStream;
   s: AnsiString;
@@ -154,10 +166,10 @@ begin
       else
       if t = 'TicksPerBeat' then
       begin
-        Partitur.DetailHeader.DeltaTimeTicks := StrToIntDef(Track.NodeValue, 120);
+        Partitur.DetailHeader.DeltaTimeTicks := StrToIntDef(GetNodeValue(Track), 120);
       end else
       if t = 'TimestampType' then
-        TimestampType := Track.NodeValue // Absolute or Delta
+        TimestampType := GetNodeValue(Track) // Absolute or Delta
       else
       if t = 'Track' then
       begin
@@ -180,11 +192,11 @@ begin
               Node1 := Event.ChildNodes[n];
               t := Node1.NodeName;
               if t = 'Delta' then
-                inc(Partitur.TrackArr[iTrack][iEvent].var_len, StrToIntDef(Node1.NodeValue, 0))
+                inc(Partitur.TrackArr[iTrack][iEvent].var_len, StrToIntDef(GetNodeValue(Node1), 0))
               else
               if t = 'Absolute' then
               begin
-                iAbsolute := StrToIntDef(Node1.NodeValue, 0);
+                iAbsolute := StrToIntDef(GetNodeValue(Node1), 0);
                 if iAbsolute > iOffset then
                 begin
                   inc(Partitur.TrackArr[iTrack][iEvent].var_len, iAbsolute - iOffset);
@@ -194,43 +206,43 @@ begin
               if t = 'TextEvent' then
               begin
                 MidiEvent.d1 := 1;
-                MidiEvent.AppendString(Node1.NodeValue);
+                MidiEvent.AppendString(GetNodeValue(Node1));
                 AppendEvent;
               end else
               if t = 'CopyrightNotice' then
               begin
                 MidiEvent.d1 := 2;
-                MidiEvent.AppendString(Node1.NodeValue);
+                MidiEvent.AppendString(GetNodeValue(Node1));
                 AppendEvent;
               end else
               if t = 'TrackName' then
               begin
                 MidiEvent.d1 := 3;
-                MidiEvent.AppendString(Node1.NodeValue);
+                MidiEvent.AppendString(GetNodeValue(Node1));
                 AppendEvent;
               end else
               if t = 'InstrumentName' then
               begin
                 MidiEvent.d1 := 4;
-                MidiEvent.AppendString(Node1.NodeValue);
+                MidiEvent.AppendString(GetNodeValue(Node1));
                 AppendEvent;
               end else
               if t = 'Lyric' then
               begin
                 MidiEvent.d1 := 5;
-                MidiEvent.AppendString(Node1.NodeValue);
+                MidiEvent.AppendString(GetNodeValue(Node1));
                 AppendEvent;
               end else
               if t = 'Marker' then
               begin
                 MidiEvent.d1 := 6;
-                MidiEvent.AppendString(Node1.NodeValue);
+                MidiEvent.AppendString(GetNodeValue(Node1));
                 AppendEvent;
               end else
               if t = 'CuePoint' then
               begin
                 MidiEvent.d1 := 7;
-                MidiEvent.AppendString(Node1.NodeValue);
+                MidiEvent.AppendString(GetNodeValue(Node1));
                 AppendEvent;
               end else
               if t = 'SetTempo' then

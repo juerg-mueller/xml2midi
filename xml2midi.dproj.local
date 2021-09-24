@@ -1,14 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.673,=C:\Users\Jürg Müller\Documents\Embarcadero\Studio\Projekte\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.398,=D:\git-win\MidiFilter\UEventArray.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.779,C:\Users\Jürg Müller\Documents\Embarcadero\Studio\Projekte\Project2.dproj=D:\git-win\MidiFilter\xmlTOmidi.dproj</Transaction>
     <Transaction>1899.12.30 00:00:00.000.387,C:\Users\Jürg Müller\Documents\Embarcadero\Studio\Projekte\Unit1.dfm=D:\git-win\MidiFilter\UMidiXml.dfm</Transaction>
     <Transaction>1899.12.30 00:00:00.000.090,=D:\git-win\MidiFilter\UMyMidiStream.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.673,=C:\Users\Jürg Müller\Documents\Embarcadero\Studio\Projekte\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.372,D:\git-win\MidiFilter\xml2midi.dproj=D:\git-win\MidiFilter\xmlTOmidi.dproj</Transaction>
     <Transaction>1899.12.30 00:00:00.000.043,=D:\git-win\MidiFilter\UMyMemoryStream.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.372,D:\git-win\MidiFilter\xml2midi.dproj=D:\git-win\MidiFilter\xmlTOmidi.dproj</Transaction>
     <Transaction>1899.12.30 00:00:00.000.028,=D:\git-win\MidiFilter\UMidiDataStream.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.210,=D:\Downloads\xml2midi-main\UMidiXmlDelphi.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.387,C:\Users\Jürg Müller\Documents\Embarcadero\Studio\Projekte\Unit1.pas=D:\git-win\MidiFilter\UMidiXml.pas</Transaction>
+    <Transaction>2021.09.24 14:18:44.305,D:\Downloads\xml2midi-main\UMidiXml.dfm=D:\Downloads\xml2midi-main\UMidiXmlDelphi.dfm</Transaction>
+    <Transaction>2021.09.24 14:18:44.305,D:\Downloads\xml2midi-main\UMidiXml.pas=D:\Downloads\xml2midi-main\UMidiXmlDelphi.pas</Transaction>
   </Transactions>
 </BorlandProject>

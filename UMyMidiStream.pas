@@ -16,6 +16,10 @@
 
 unit UMyMidiStream;
 
+{$if defined(LAZARUS)}
+  {$MODE Delphi}
+{$endif}
+
 interface
 
 uses
@@ -471,29 +475,6 @@ end;
 class function TMyMidiStream.IsEndOfTrack(const d: TInt4): boolean;
 begin
   result :=  (d[1] = $ff) and (d[2] = $2f) and (d[3] = 0);
-end;
-
-var
-  sqrt_12_2: double;
-  iPitch: integer;
-  PitchFrequencies: array [0..127] of double;
-
-function PitchFrequenz(Pitch: byte): double;
-begin
-  result := PitchFrequencies[Pitch and $7f];
-{
-  result := 27.500;
-  while Pitch >= 12 do
-  begin
-    result := 2 * result;
-    dec(Pitch, 12);
-  end;
-  while Pitch > 0 do
-  begin
-    result := sqrt_12_2 * result;
-    dec(Pitch);
-  end;
-}
 end;
 
 

@@ -1,0 +1,36 @@
+object Form1: TForm1
+  Left = 5
+  Height = 385
+  Top = 440
+  Width = 943
+  AllowDropFiles = True
+  Caption = 'XML to MIDI Converter'
+  ClientHeight = 385
+  ClientWidth = 943
+  OnCreate = FormCreate
+  OnDropFiles = FormDropFiles
+  Position = poDesktopCenter
+  LCLVersion = '2.0.0.4'
+  object Label1: TLabel
+    Left = 256
+    Height = 51
+    Top = 88
+    Width = 430
+    Caption = 'Drop MIDIXML here!'
+    Font.Height = -43
+    Font.Name = 'Sans'
+    ParentColor = False
+    ParentFont = False
+  end
+  object Memo: TMemo
+    Left = 0
+    Height = 161
+    Top = 224
+    Width = 943
+    Align = alBottom
+    ReadOnly = True
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+    WordWrap = False
+  end
+end

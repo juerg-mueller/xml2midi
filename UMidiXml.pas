@@ -253,7 +253,7 @@ begin
               end else
               if t = 'TimeSignature' then
               begin
-                MidiEvent.d1 := $59;
+                MidiEvent.d1 := $58;
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['Numerator'], 4));
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['LogDenominator'], 2));
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['MIDIClocksPerMetronomeClick'], 24));
@@ -262,7 +262,7 @@ begin
               end else
               if t = 'KeySignature' then
               begin
-                MidiEvent.d1 := $58;
+                MidiEvent.d1 := $59;
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['Fifths'], 4));
                 MidiEvent.AppendByte(StrToIntDef(Node1.Attributes['Mode'], 2));
                 AppendEvent;
@@ -287,7 +287,7 @@ begin
               begin
                 MidiEvent.command := StrToIntDef(Node1.Attributes['Channel'], 0) or $B0;
                 MidiEvent.d1 := StrToIntDef(Node1.Attributes['Control'], 0);
-                MidiEvent.d1 := StrToIntDef(Node1.Attributes['Value'], 0);
+                MidiEvent.d2 := StrToIntDef(Node1.Attributes['Value'], 0);
                 AppendEvent;
               end else
               if (t = 'NoteOn') or (t = 'NoteOff') then

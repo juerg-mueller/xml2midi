@@ -123,6 +123,7 @@ var
 var
   mem: TMemoryStream;
   s: AnsiString;
+  ext: string;
   t: string;
   Delta: string;
   i, k, n: integer;
@@ -136,12 +137,16 @@ var
 begin
   Savename := Filename;
   SetLength(Savename, Length(Savename) - Length(ExtractFileExt(Savename)));
-  Savename := Savename + '.mid';
-  if FileExists(Savename) then
+  ext := '.mid';
+  if FileExists(Savename + ext) then
   begin
-    writeln(Savename, ' already exists!');
-    exit;
+    i := 1;
+    repeat
+      ext := '_' + IntToStr(i) + '.mid';
+      inc(i);
+    until not FileExists(Savename + ext);
   end;
+  Savename := Savename + ext;
 
   Partitur := TEventArray.Create;
   mem := TMemoryStream.Create;
